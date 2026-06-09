@@ -172,6 +172,73 @@
   .driver-table .driver-name-cell { display: flex; align-items: center; gap: 8px; }
 
   /* ======================== */
+  /* FLEET EXPENSE PAGE       */
+  /* ======================== */
+  .fleet-page { padding: 24px; }
+  .fleet-page .page-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 16px; }
+  .fleet-page .title-block .subtitle { font-size: 12px; color: #5C5F61; margin-top: 4px; }
+  .fleet-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+  .fleet-toolbar { display: flex; align-items: center; padding: 12px 16px; gap: 12px; border-bottom: 1px solid #f1f5f9; }
+  .fleet-toolbar .per-page { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; color: #374151; background: #fff; cursor: pointer; }
+  .fleet-toolbar .spacer { flex: 1; }
+  .fleet-toolbar .row-counter { font-size: 12px; color: #5C5F61; }
+  .fleet-toolbar .icon-btn { width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; color: #27AAE1; font-size: 16px; }
+  .fleet-toolbar .icon-btn:hover { background: #EAF9FF; }
+  .filter-chip-row { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px 12px; border-bottom: 1px solid #f1f5f9; }
+  .chip { height: 26px; padding: 0 10px; border-radius: 13px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; background: #fff; border: 1px solid #BEE5F5; color: #27AAE1; cursor: pointer; }
+  .chip:hover { background: #EAF9FF; }
+  .fleet-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .fleet-table thead th { background: #f8fafc; padding: 12px 14px; text-align: left; font-weight: 600; font-size: 12px; color: #5C5F61; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+  .fleet-table thead th.col-checkbox { width: 40px; padding: 12px 0; text-align: center; }
+  .fleet-table thead th.col-action { width: 44px; }
+  .fleet-table thead th.col-num { width: 130px; }
+  .fleet-table thead th.col-other { width: 100px; }
+  .fleet-table tbody td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #374151; vertical-align: middle; white-space: nowrap; }
+  .fleet-table tbody td.col-checkbox { text-align: center; padding: 12px 0; }
+  .fleet-table tbody td.num { font-variant-numeric: tabular-nums; }
+  .fleet-table tbody tr:hover { background: #EAF9FF; }
+  .fleet-table tbody tr:last-child td { border-bottom: none; }
+  .row-checkbox { width: 16px; height: 16px; border: 1.5px solid #d1d5db; border-radius: 3px; display: inline-block; background: #fff; vertical-align: middle; cursor: pointer; position: relative; }
+  .row-checkbox.checked { background: #27AAE1; border-color: #27AAE1; }
+  .row-checkbox.checked::after { content: ""; position: absolute; left: 4px; top: 0; width: 4px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .tag-small { display: inline-block; height: 20px; padding: 0 8px; border-radius: 10px; font-size: 11px; line-height: 20px; background: #F2F3F5; color: #5C5F61; }
+  .tag-small.has { background: #EAF9FF; color: #00658F; }
+  .row-action-btn { width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; color: #5C5F61; font-size: 16px; line-height: 1; position: relative; }
+  .row-action-btn:hover { background: #EAF9FF; }
+  .action-menu { position: absolute; right: 36px; top: 0; min-width: 160px; background: #fff; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); padding: 4px; z-index: 30; display: none; }
+  .action-menu.open { display: block; }
+  .action-menu .item { padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #374151; cursor: pointer; }
+  .action-menu .item:hover { background: #f5f7fa; }
+  .action-menu .item.danger { color: #BA1A1A; }
+  .action-menu .item.danger:hover { background: #FFEDEA; }
+
+  /* Fleet dialog (modal-md) */
+  .modal-md { width: 720px; }
+  .fleet-form-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; row-gap: 14px; }
+  .fleet-form-grid .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .fleet-form-grid .field.full { grid-column: 1 / -1; }
+  .fleet-form-grid .field-label { font-size: 12px; font-weight: 600; color: #374151; }
+  .fleet-form-grid .field-label .req { color: #27AAE1; }
+  .fleet-form-grid .field-hint { font-size: 11px; color: #8F9193; margin-top: 2px; }
+  .fleet-form-grid .field-hint code { background: #f5f7fa; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+  .input-with-unit { position: relative; }
+  .input-with-unit input { padding-right: 56px !important; text-align: right; }
+  .input-with-unit .unit { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #8F9193; pointer-events: none; }
+  .dialog-reminder { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #5C5F61; margin-top: 4px; }
+  .dialog-reminder .icon { color: #E36D0D; font-size: 14px; }
+
+  .other-fee-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .other-fee-header { display: grid; grid-template-columns: 1fr 160px 120px 32px; gap: 8px; }
+  .other-fee-header .h { font-size: 11px; font-weight: 600; color: #8F9193; }
+  .other-fee-row { display: grid; grid-template-columns: 1fr 160px 120px 32px; gap: 8px; align-items: center; }
+  .other-fee-row input, .other-fee-row select { padding: 7px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; width: 100%; }
+  .other-fee-row .delete-btn { width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; color: #BA1A1A; font-size: 14px; }
+  .other-fee-row .delete-btn:hover { background: #FFEDEA; }
+  .empty-fee-list { padding: 14px; text-align: center; color: #8F9193; font-size: 12px; background: #FBFCFF; border-radius: 6px; border: 1px dashed #e2e8f0; }
+  .add-row-btn { align-self: flex-start; height: 30px; padding: 0 10px; border-radius: 6px; font-size: 12px; color: #27AAE1; background: transparent; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; }
+  .add-row-btn:hover { background: #EAF9FF; }
+
+  /* ======================== */
   /* MODALS                   */
   /* ======================== */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
@@ -314,6 +381,7 @@
         <div class="menu-item" onclick="switchTab('realtime')">即時監控</div>
         <div class="menu-item" onclick="switchTab('list')">司機列表</div>
         <div class="menu-item active" onclick="switchTab('schedule')">司機班表</div>
+        <div class="menu-item" onclick="switchTab('fleet')">宜得利車費明細設定</div>
       </div>
       <div class="menu-item menu-parent"><span class="icon">&#128663;</span> 車輛管理 <span class="chevron">&#9660;</span></div>
       <div class="menu-item menu-parent"><span class="icon">&#128178;</span> 定價管理 <span class="chevron">&#9660;</span></div>
@@ -400,6 +468,35 @@
       <div class="driver-list-page">
         <div class="table-card">
           <table class="driver-table" id="driverTable"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ FLEET EXPENSE PAGE ============ -->
+    <div id="fleetExpensePage" style="display:none; flex:1; overflow:auto;">
+      <div class="fleet-page">
+        <div class="page-title-row">
+          <div class="title-block">
+            <h1 style="font-size:20px;font-weight:600;color:#1a1a2e;margin:0;">宜得利車費明細設定</h1>
+            <div class="subtitle">為每個車隊設定費率與補助項目，月結與派車單成本將自動套用</div>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="openFleetDialog()">＋ 新增車隊</button>
+          </div>
+        </div>
+
+        <div class="fleet-card">
+          <div class="fleet-toolbar">
+            <button class="per-page">15 / 頁 ▾</button>
+            <div class="spacer"></div>
+            <span class="row-counter" id="fleetRowCounter">1-4 列（共 4 列）</span>
+            <button class="icon-btn" title="搜尋" onclick="showToast('搜尋功能尚未實作（mock）','')">⌕</button>
+          </div>
+          <div class="filter-chip-row">
+            <span class="chip" onclick="showToast('已重新整理篩選','')">啟用中 ⟳</span>
+            <span class="chip" onclick="this.remove()">關鍵字：北 ✕</span>
+          </div>
+          <table class="fleet-table" id="fleetTable"></table>
         </div>
       </div>
     </div>
@@ -613,6 +710,90 @@
     <div class="modal-footer" id="uploadFooter">
       <button class="btn btn-secondary" onclick="handleUploadBack()" id="uploadCancelBtn">取消</button>
       <button class="btn btn-primary" id="uploadActionBtn" style="display:none;" onclick="handleUploadAction()">上傳檔案</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== -->
+<!-- FLEET EXPENSE DIALOG     -->
+<!-- ======================== -->
+<div class="modal-overlay" id="fleetModal">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <div>
+        <h3 id="fleetModalTitle">新增車隊費用</h3>
+        <div class="dialog-reminder"><span class="icon">⚠</span>車隊名稱會用來比對司機名稱前綴，請確認與司機建檔的車行名一致</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('fleetModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="fleet-form-grid">
+        <div class="field full">
+          <label class="field-label">車隊名稱 <span class="req">*</span></label>
+          <input class="input-field" id="fleetName" type="text" placeholder="例：北宏物流" style="padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" oninput="this.style.borderColor='#d1d5db'">
+          <div class="field-hint">同租戶內不可重複；對應司機名稱中 <code>車行名-出車類型-車次-材積</code> 的第一段</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">契約車費率 <span class="req">*</span></label>
+          <div class="input-with-unit">
+            <input class="input-field" id="fleetContractRate" type="text" placeholder="0" inputmode="numeric" style="padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+            <span class="unit">元 / 趟</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">機動車費率 <span class="req">*</span></label>
+          <div class="input-with-unit">
+            <input class="input-field" id="fleetSpotRate" type="text" placeholder="0" inputmode="numeric" style="padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+            <span class="unit">元 / 趟</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">加班費</label>
+          <div class="input-with-unit">
+            <input class="input-field" id="fleetOvertime" type="text" placeholder="0" inputmode="numeric" style="padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+            <span class="unit">元 / 小時</span>
+          </div>
+        </div>
+        <div class="field"></div>
+
+        <div class="field">
+          <label class="field-label">宜蘭補助</label>
+          <div class="input-with-unit">
+            <input class="input-field" id="fleetYilan" type="text" placeholder="0" inputmode="numeric" style="padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+            <span class="unit">元 / 趟</span>
+          </div>
+          <div class="field-hint">該趟訂單地址含「宜蘭」時加計</div>
+        </div>
+        <div class="field">
+          <label class="field-label">花蓮補助</label>
+          <div class="input-with-unit">
+            <input class="input-field" id="fleetHualien" type="text" placeholder="0" inputmode="numeric" style="padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+            <span class="unit">元 / 趟</span>
+          </div>
+          <div class="field-hint">該趟訂單地址含「花蓮」時加計</div>
+        </div>
+
+        <div class="field full">
+          <label class="field-label">其他費用</label>
+          <div class="field-hint">針對該車隊加計的固定費用項目（例：燃油補貼、停車費）</div>
+          <div class="other-fee-header" id="otherFeeHeader" style="display:none;margin-top:8px;">
+            <div class="h">項目名稱</div>
+            <div class="h">金額</div>
+            <div class="h">單位</div>
+            <div></div>
+          </div>
+          <div class="other-fee-list" id="otherFeeList">
+            <div class="empty-fee-list" id="otherFeeEmpty">尚無項目。點下方「新增項目」開始建立。</div>
+          </div>
+          <button class="add-row-btn" type="button" onclick="addOtherFee()">＋ 新增項目</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('fleetModal')">取消</button>
+      <button class="btn btn-primary" onclick="saveFleet()">儲存</button>
     </div>
   </div>
 </div>
@@ -1068,10 +1249,13 @@ function switchTab(t){
   const items=document.querySelectorAll('.menu-sub .menu-item');
   const sched = document.getElementById('schedulePage');
   const list = document.getElementById('driverListPage');
+  const fleet = document.getElementById('fleetExpensePage');
   const tp = document.getElementById('topbarPage');
-  if(t==='realtime'){items[0].classList.add('active'); sched.style.display='none'; list.style.display='none'; tp.textContent='即時監控'; showToast('即時監控頁面（mock）','');}
-  else if(t==='list'){items[1].classList.add('active'); sched.style.display='none'; list.style.display='flex'; list.style.flexDirection='column'; tp.textContent='司機列表'; renderDriverList();}
-  else {items[2].classList.add('active'); sched.style.display=''; list.style.display='none'; tp.textContent='司機班表';}
+  const hideAll = () => { sched.style.display='none'; list.style.display='none'; fleet.style.display='none'; };
+  if(t==='realtime'){items[0].classList.add('active'); hideAll(); tp.textContent='即時監控'; showToast('即時監控頁面（mock）','');}
+  else if(t==='list'){items[1].classList.add('active'); hideAll(); list.style.display='flex'; list.style.flexDirection='column'; tp.textContent='司機列表'; renderDriverList();}
+  else if(t==='fleet'){items[3].classList.add('active'); hideAll(); fleet.style.display='flex'; fleet.style.flexDirection='column'; tp.textContent='宜得利車費明細設定'; renderFleetTable();}
+  else {items[2].classList.add('active'); hideAll(); sched.style.display=''; tp.textContent='司機班表';}
 }
 function toggleMenu(el){el.classList.toggle('expanded');const sub=el.nextElementSibling;if(sub)sub.style.display=sub.style.display==='none'?'':'none';}
 function filterDrivers(){
@@ -1135,6 +1319,208 @@ function showToastWithAction(msg, type, actionLabel, actionFn) {
 }
 function showTip(e,text){const t=document.getElementById('tooltip');t.innerHTML=text.replace(/\\n/g,'<br>');t.style.display='block';const r=e.target.getBoundingClientRect();t.style.left=Math.min(r.left+r.width/2,window.innerWidth-200)+'px';t.style.top=(r.top-t.offsetHeight-10)+'px';}
 function hideTip(){document.getElementById('tooltip').style.display='none';}
+
+// ========================
+// FLEET EXPENSE DATA & UI
+// ========================
+const fleetData = [
+  { id: 1, name: '北宏物流', contract: 2800, spot: 3200, overtime: 500, yilan: 200, hualien: 300, others: [{name:'燃油補貼',amount:150,unit:'每趟'},{name:'停車費',amount:80,unit:'每趟'}] },
+  { id: 2, name: '順興運輸', contract: 2600, spot: 3000, overtime: 450, yilan: 200, hualien: 0, others: [] },
+  { id: 3, name: '東部快遞', contract: 3000, spot: 3500, overtime: 500, yilan: 250, hualien: 400, others: [{name:'過路費',amount:120,unit:'每趟'},{name:'冷藏附加',amount:300,unit:'每趟'},{name:'夜間補貼',amount:200,unit:'每日'}] },
+  { id: 4, name: '全球物流', contract: 2500, spot: 2900, overtime: 400, yilan: 0, hualien: 0, others: [] },
+];
+let fleetSeq = 5;
+let openActionMenuId = null;
+
+function renderFleetTable() {
+  const t = document.getElementById('fleetTable');
+  const money = v => v ? '$' + v.toLocaleString() : '—';
+  let h = `<thead><tr>
+    <th class="col-checkbox"><span class="row-checkbox" onclick="this.classList.toggle('checked')"></span></th>
+    <th>車隊名稱</th>
+    <th class="col-num">契約車費率</th>
+    <th class="col-num">機動車費率</th>
+    <th class="col-num">加班費</th>
+    <th class="col-num">宜蘭補助</th>
+    <th class="col-num">花蓮補助</th>
+    <th class="col-other">其他費用</th>
+    <th class="col-action"></th>
+  </tr></thead><tbody>`;
+  fleetData.forEach(f => {
+    const otherCount = f.others.length;
+    const otherTag = otherCount > 0
+      ? `<span class="tag-small has" title="${f.others.map(o=>o.name).join('、')}">${otherCount} 項</span>`
+      : `<span class="tag-small">0 項</span>`;
+    h += `<tr>
+      <td class="col-checkbox"><span class="row-checkbox" onclick="this.classList.toggle('checked')"></span></td>
+      <td style="font-weight:500;">${f.name}</td>
+      <td class="num">${money(f.contract)} / 趟</td>
+      <td class="num">${money(f.spot)} / 趟</td>
+      <td class="num">${f.overtime ? '$'+f.overtime.toLocaleString()+' / 小時' : '—'}</td>
+      <td class="num">${f.yilan ? '$'+f.yilan.toLocaleString()+' / 趟' : '—'}</td>
+      <td class="num">${f.hualien ? '$'+f.hualien.toLocaleString()+' / 趟' : '—'}</td>
+      <td>${otherTag}</td>
+      <td style="position:relative;">
+        <button class="row-action-btn" onclick="toggleFleetActionMenu(event, ${f.id})">⋮</button>
+        <div class="action-menu" id="actionMenu-${f.id}">
+          <div class="item" onclick="editFleet(${f.id})">✎ 編輯</div>
+          <div class="item" onclick="showToast('查看歸屬司機（mock）','')">👥 查看歸屬司機</div>
+          <div class="item danger" onclick="deleteFleet(${f.id})">🗑 刪除</div>
+        </div>
+      </td>
+    </tr>`;
+  });
+  h += '</tbody>';
+  t.innerHTML = h;
+  document.getElementById('fleetRowCounter').textContent = `1-${fleetData.length} 列（共 ${fleetData.length} 列）`;
+}
+
+function toggleFleetActionMenu(event, id) {
+  event.stopPropagation();
+  // Close any other open menu
+  document.querySelectorAll('.action-menu.open').forEach(el => {
+    if (el.id !== 'actionMenu-' + id) el.classList.remove('open');
+  });
+  const menu = document.getElementById('actionMenu-' + id);
+  if (menu) menu.classList.toggle('open');
+}
+
+// Close action menu on outside click
+document.addEventListener('click', () => {
+  document.querySelectorAll('.action-menu.open').forEach(el => el.classList.remove('open'));
+});
+
+let editingFleetId = null;
+
+function openFleetDialog() {
+  editingFleetId = null;
+  document.getElementById('fleetModalTitle').textContent = '新增車隊費用';
+  ['fleetName','fleetContractRate','fleetSpotRate','fleetOvertime','fleetYilan','fleetHualien'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  resetOtherFeeList();
+  document.getElementById('fleetModal').classList.add('show');
+  setTimeout(() => document.getElementById('fleetName')?.focus(), 50);
+}
+
+function editFleet(id) {
+  document.querySelectorAll('.action-menu.open').forEach(el => el.classList.remove('open'));
+  const f = fleetData.find(x => x.id === id);
+  if (!f) return;
+  editingFleetId = id;
+  document.getElementById('fleetModalTitle').textContent = '編輯車隊費用';
+  document.getElementById('fleetName').value = f.name;
+  document.getElementById('fleetContractRate').value = f.contract || '';
+  document.getElementById('fleetSpotRate').value = f.spot || '';
+  document.getElementById('fleetOvertime').value = f.overtime || '';
+  document.getElementById('fleetYilan').value = f.yilan || '';
+  document.getElementById('fleetHualien').value = f.hualien || '';
+  resetOtherFeeList();
+  f.others.forEach(o => addOtherFee(o));
+  document.getElementById('fleetModal').classList.add('show');
+}
+
+function deleteFleet(id) {
+  document.querySelectorAll('.action-menu.open').forEach(el => el.classList.remove('open'));
+  const f = fleetData.find(x => x.id === id);
+  if (!f) return;
+  if (confirm(`確定刪除車隊「${f.name}」？此操作無法復原。`)) {
+    const idx = fleetData.findIndex(x => x.id === id);
+    fleetData.splice(idx, 1);
+    renderFleetTable();
+    showToast(`已刪除車隊「${f.name}」`, 'success');
+  }
+}
+
+function resetOtherFeeList() {
+  const list = document.getElementById('otherFeeList');
+  list.innerHTML = '<div class="empty-fee-list" id="otherFeeEmpty">尚無項目。點下方「新增項目」開始建立。</div>';
+  document.getElementById('otherFeeHeader').style.display = 'none';
+}
+
+let otherFeeSeq = 0;
+function addOtherFee(prefill) {
+  const list = document.getElementById('otherFeeList');
+  const empty = document.getElementById('otherFeeEmpty');
+  if (empty) empty.remove();
+  document.getElementById('otherFeeHeader').style.display = 'grid';
+  const id = ++otherFeeSeq;
+  const row = document.createElement('div');
+  row.className = 'other-fee-row';
+  row.dataset.id = id;
+  const name = prefill?.name || '';
+  const amount = prefill?.amount || '';
+  const unit = prefill?.unit || '每趟';
+  row.innerHTML = `
+    <input type="text" placeholder="例：燃油補貼" value="${name}">
+    <input type="text" placeholder="0" inputmode="numeric" value="${amount}" style="text-align:right;">
+    <select>
+      <option ${unit==='每趟'?'selected':''}>每趟</option>
+      <option ${unit==='每日'?'selected':''}>每日</option>
+      <option ${unit==='每月'?'selected':''}>每月</option>
+      <option ${unit==='每件'?'selected':''}>每件</option>
+    </select>
+    <button class="delete-btn" type="button" onclick="removeOtherFee(${id})">🗑</button>
+  `;
+  list.appendChild(row);
+}
+
+function removeOtherFee(id) {
+  const list = document.getElementById('otherFeeList');
+  const row = list.querySelector(`[data-id="${id}"]`);
+  if (row) row.remove();
+  if (list.children.length === 0) {
+    resetOtherFeeList();
+  }
+}
+
+function readOtherFeesFromForm() {
+  const rows = document.querySelectorAll('#otherFeeList .other-fee-row');
+  const out = [];
+  rows.forEach(r => {
+    const inputs = r.querySelectorAll('input, select');
+    const name = inputs[0].value.trim();
+    const amount = parseInt(inputs[1].value, 10);
+    const unit = inputs[2].value;
+    if (name && !isNaN(amount)) out.push({ name, amount, unit });
+  });
+  return out;
+}
+
+function saveFleet() {
+  const name = document.getElementById('fleetName').value.trim();
+  if (!name) {
+    const input = document.getElementById('fleetName');
+    input.style.borderColor = '#BA1A1A';
+    input.focus();
+    showToast('請輸入車隊名稱', 'error');
+    return;
+  }
+  const dup = fleetData.find(f => f.name === name && f.id !== editingFleetId);
+  if (dup) { showToast('車隊名稱不可重複', 'error'); return; }
+
+  const data = {
+    name,
+    contract: parseInt(document.getElementById('fleetContractRate').value, 10) || 0,
+    spot: parseInt(document.getElementById('fleetSpotRate').value, 10) || 0,
+    overtime: parseInt(document.getElementById('fleetOvertime').value, 10) || 0,
+    yilan: parseInt(document.getElementById('fleetYilan').value, 10) || 0,
+    hualien: parseInt(document.getElementById('fleetHualien').value, 10) || 0,
+    others: readOtherFeesFromForm(),
+  };
+
+  if (editingFleetId) {
+    const f = fleetData.find(x => x.id === editingFleetId);
+    Object.assign(f, data);
+    showToast(`已更新車隊「${name}」`, 'success');
+  } else {
+    fleetData.push({ id: fleetSeq++, ...data });
+    showToast(`已建立車隊「${name}」`, 'success');
+  }
+
+  closeModal('fleetModal');
+  renderFleetTable();
+}
 
 // ========================
 // INIT
