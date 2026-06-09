@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>司機班表管理 - 含新增司機 Prototype</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1a1a2e; }
+
+  /* Layout */
+  .app { display: flex; height: 100vh; }
+
+  /* ======================== */
+  /* SIDEBAR                  */
+  /* ======================== */
+  .sidebar { width: 230px; background: #fff; border-right: 1px solid #e2e8f0; padding: 0; flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; }
+  .sidebar-logo { padding: 14px 18px; font-size: 15px; font-weight: 700; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; color: #1a1a2e; }
+  .sidebar-logo .logo-icon { width: 30px; height: 30px; background: #27AAE1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+  .sidebar-user { padding: 12px 18px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #374151; }
+  .sidebar-user .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6b7280; }
+  .menu-section { padding: 6px 0; }
+  .menu-item { padding: 9px 18px; cursor: pointer; font-size: 13px; color: #5C5F61; transition: all 0.15s; display: flex; align-items: center; gap: 10px; border-radius: 0; position: relative; }
+  .menu-item:hover { background: #f5f7fa; color: #1a1a2e; }
+  .menu-item .icon { font-size: 16px; width: 20px; text-align: center; color: #8F9193; }
+  .menu-item .chevron { margin-left: auto; font-size: 12px; color: #8F9193; transition: transform 0.2s; }
+  .menu-parent { font-weight: 500; color: #374151; }
+  .menu-parent.expanded .chevron { transform: rotate(180deg); }
+  .menu-sub { padding-left: 0; }
+  .menu-sub .menu-item { font-size: 13px; padding: 8px 18px 8px 48px; color: #5C5F61; }
+  .menu-sub .menu-item:hover { background: #f0f7ff; color: #27AAE1; }
+  .menu-sub .menu-item.active { background: #27AAE1; color: #fff; font-weight: 500; }
+  .menu-sub .menu-item.active:hover { background: #1E9AD0; }
+  .sidebar-footer { margin-top: auto; padding: 10px 18px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #8F9193; }
+
+  /* Main */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* Top Bar */
+  .topbar { background: #fff; padding: 0 24px; height: 48px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px; }
+  .topbar-hamburger { font-size: 18px; cursor: pointer; color: #5C5F61; }
+  .topbar-brand { font-size: 14px; font-weight: 600; color: #374151; }
+  .topbar-page { font-size: 13px; color: #8F9193; margin-left: 4px; }
+
+  /* Header */
+  .header { background: #fff; padding: 14px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .header-left h1 { font-size: 20px; font-weight: 600; color: #1a1a2e; }
+  .header-actions { display: flex; gap: 8px; }
+
+  /* Buttons */
+  .btn { padding: 7px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary { background: #27AAE1; color: #fff; }
+  .btn-primary:hover { background: #1E9AD0; }
+  .btn-outline { background: #fff; color: #27AAE1; border: 1px solid #27AAE1; }
+  .btn-outline:hover { background: #EAF9FF; }
+  .btn-secondary { background: #fff; color: #374151; border: 1px solid #d1d5db; }
+  .btn-secondary:hover { background: #f9fafb; }
+  .btn-success { background: #10b981; color: #fff; }
+  .btn-success:hover { background: #059669; }
+  .btn-danger { background: #ef4444; color: #fff; }
+  .btn-danger:hover { background: #dc2626; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Toolbar */
+  .toolbar { background: #fff; padding: 10px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .toolbar-left { display: flex; align-items: center; gap: 12px; }
+  .toolbar-right { display: flex; align-items: center; gap: 8px; }
+  .view-toggle { display: flex; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; }
+  .view-toggle .btn { border-radius: 0; border: none; border-right: 1px solid #d1d5db; }
+  .view-toggle .btn:last-child { border-right: none; }
+  .view-toggle .btn.active { background: #27AAE1; color: #fff; }
+  .nav-btn { background: none; border: 1px solid #d1d5db; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: #f3f4f6; }
+  .current-period { font-size: 15px; font-weight: 600; min-width: 150px; text-align: center; }
+
+  /* Filter */
+  .filter-bar { display: flex; align-items: center; gap: 8px; }
+  .filter-bar select, .filter-bar input { padding: 5px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; }
+
+  /* Legend */
+  .legend-bar { background: #fff; padding: 8px 24px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 16px; font-size: 12px; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 12px; height: 6px; border-radius: 2px; }
+  .legend-dot.day { background: #27AAE1; }
+  .legend-dot.night { background: #8b5cf6; }
+  .legend-dot.cross { background: #f59e0b; }
+  .legend-dot.off { background: #D1D1D6; }
+  .legend-label { color: #5C5F61; }
+  .legend-count { font-weight: 600; color: #374151; }
+
+  /* Content */
+  .content { flex: 1; overflow: auto; padding: 0; }
+
+  /* ======================== */
+  /* HOURLY TIMELINE VIEW     */
+  /* ======================== */
+  .timeline-container { display: flex; flex-direction: column; min-width: fit-content; }
+  .timeline-header-row { display: flex; position: sticky; top: 0; z-index: 10; background: #f8fafc; }
+  .timeline-corner { width: 150px; min-width: 150px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; border-right: 1px solid #e2e8f0; position: sticky; left: 0; z-index: 11; padding: 8px 12px; font-size: 11px; font-weight: 600; color: #5C5F61; display: flex; align-items: flex-end; }
+  .timeline-date-group { display: flex; flex-direction: column; }
+  .timeline-date-label { text-align: center; font-size: 12px; font-weight: 600; padding: 4px 0; border-bottom: 1px solid #e2e8f0; background: #f8fafc; color: #374151; min-width: calc(28px * 24); }
+  .timeline-date-label.today { background: #EAF9FF; color: #27AAE1; }
+  .timeline-date-label.weekend { background: #FFEDEA; color: #BA1A1A; }
+  .timeline-hours { display: flex; }
+  .timeline-hour { width: 28px; min-width: 28px; text-align: center; font-size: 9px; color: #8F9193; padding: 3px 0; border-bottom: 2px solid #e2e8f0; border-right: 1px solid #f1f5f9; }
+  .timeline-hour.h6, .timeline-hour.h12, .timeline-hour.h18 { color: #5C5F61; font-weight: 600; border-right: 1px solid #D1D1D6; }
+
+  .timeline-row { display: flex; border-bottom: 1px solid #e2e8f0; }
+  .timeline-row:hover { background: #fafbff; }
+  .timeline-staff { width: 150px; min-width: 150px; padding: 6px 12px; display: flex; align-items: center; gap: 8px; border-right: 1px solid #e2e8f0; position: sticky; left: 0; z-index: 5; background: #fff; cursor: pointer; }
+  .timeline-staff:hover { background: #EAF9FF; }
+  .timeline-row:hover .timeline-staff { background: #fafbff; }
+  .staff-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0; }
+  .staff-avatar.driver { background: #27AAE1; }
+  .staff-info { display: flex; flex-direction: column; min-width: 0; }
+  .staff-info .name-row { display: flex; align-items: center; gap: 4px; }
+  .staff-info .name { font-size: 12px; font-weight: 600; color: #374151; }
+  .staff-info .role { font-size: 10px; color: #8F9193; }
+  .new-badge { display: inline-block; background: #10b981; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 8px; font-weight: 600; letter-spacing: 0.3px; }
+
+  .timeline-shifts { position: relative; display: flex; }
+  .timeline-day-block { position: relative; width: calc(28px * 24); min-width: calc(28px * 24); height: 42px; border-right: 2px solid #e2e8f0; }
+  .timeline-day-block.clickable { cursor: pointer; }
+  .timeline-day-block.clickable:hover { background: rgba(39,170,225,0.04); }
+
+  .shift-bar { position: absolute; top: 6px; height: 30px; border-radius: 4px; display: flex; align-items: center; padding: 0 6px; font-size: 10px; font-weight: 600; cursor: pointer; transition: filter 0.15s, transform 0.1s; z-index: 2; overflow: hidden; white-space: nowrap; }
+  .shift-bar:hover { filter: brightness(0.9); transform: scaleY(1.12); z-index: 3; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .shift-bar.day-shift { background: #D4EFFC; color: #0B6E99; border: 1px solid #8DD4F0; }
+  .shift-bar.night-shift { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+  .shift-bar.cross-day { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .shift-bar.off-day { background: #F2F3F5; color: #8F9193; border: 1px solid #D1D1D6; }
+  .shift-bar .shift-bar-time { margin-right: 6px; }
+  .shift-bar .shift-bar-label { font-size: 9px; font-weight: 400; opacity: 0.8; }
+  .shift-bar.cross-day-start { border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+  .shift-bar.cross-day-start::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 12px; background: linear-gradient(90deg, transparent, #fde68a); }
+  .shift-bar.cross-day-end { border-left: none; border-top-left-radius: 0; border-bottom-left-radius: 0; opacity: 0.7; }
+
+  /* ======================== */
+  /* WEEK GRID VIEW           */
+  /* ======================== */
+  .week-grid { display: grid; grid-template-columns: 150px repeat(7, 1fr); min-height: 100%; }
+  .week-header { background: #f8fafc; padding: 8px 6px; text-align: center; font-size: 11px; font-weight: 600; border-bottom: 2px solid #e2e8f0; border-right: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 2; }
+  .week-header.today { background: #EAF9FF; color: #27AAE1; }
+  .week-header.weekend { background: #FFEDEA; color: #BA1A1A; }
+  .week-header .date { font-size: 16px; font-weight: 700; margin-top: 2px; }
+  .week-header .day { font-size: 10px; color: #8F9193; }
+  .staff-name-cell { background: #fff; padding: 6px 12px; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; position: sticky; left: 0; z-index: 1; min-height: 56px; }
+  .schedule-cell { background: #fff; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 4px; min-height: 56px; cursor: pointer; transition: background 0.15s; }
+  .schedule-cell:hover { background: #f8fafc; }
+  .schedule-cell.today { background: #FAFEFF; }
+  .shift-block { border-radius: 4px; padding: 3px 6px; font-size: 10px; cursor: pointer; transition: all 0.15s; }
+  .shift-block:hover { filter: brightness(0.95); }
+  .shift-block.day-shift { background: #D4EFFC; color: #0B6E99; border-left: 3px solid #27AAE1; }
+  .shift-block.night-shift { background: #ede9fe; color: #5b21b6; border-left: 3px solid #8b5cf6; }
+  .shift-block.cross-day { background: #fef3c7; color: #92400e; border-left: 3px solid #f59e0b; }
+  .shift-block.off-day { background: #F2F3F5; color: #8F9193; border-left: 3px solid #D1D1D6; text-align: center; font-style: italic; }
+  .shift-time { font-weight: 600; }
+  .shift-label { font-size: 9px; margin-top: 1px; }
+
+  /* ======================== */
+  /* DRIVER LIST PAGE (mock)  */
+  /* ======================== */
+  .driver-list-page { padding: 24px; }
+  .driver-list-page .table-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+  .driver-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .driver-table th { background: #f8fafc; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; color: #5C5F61; border-bottom: 1px solid #e2e8f0; }
+  .driver-table td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #374151; }
+  .driver-table tr:last-child td { border-bottom: none; }
+  .driver-table tr.new-row { background: #ECFDF5; animation: highlight 2.4s ease-out; }
+  @keyframes highlight { 0% { background: #A7F3D0; } 100% { background: #ECFDF5; } }
+  .driver-table .driver-name-cell { display: flex; align-items: center; gap: 8px; }
+
+  /* ======================== */
+  /* MODALS                   */
+  /* ======================== */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: #fff; border-radius: 12px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .modal-sm { width: 520px; }
+  .modal-lg { width: 800px; }
+  .modal-header { padding: 14px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h3 { font-size: 15px; font-weight: 600; }
+  .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: #8F9193; padding: 4px; }
+  .modal-close:hover { color: #374151; }
+  .modal-body { padding: 20px; }
+  .modal-footer { padding: 14px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; }
+  .modal-footer.has-delete { justify-content: space-between; }
+
+  /* Driver mode tabs (inside shift modal) */
+  .driver-mode-tabs { display: flex; background: #f5f7fa; border-radius: 8px; padding: 4px; margin-bottom: 14px; gap: 4px; }
+  .driver-mode-tab { flex: 1; padding: 8px 12px; font-size: 13px; font-weight: 500; color: #5C5F61; text-align: center; border-radius: 6px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .driver-mode-tab:hover { color: #1a1a2e; }
+  .driver-mode-tab.active { background: #fff; color: #27AAE1; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .driver-mode-tab .tab-icon { font-size: 14px; }
+
+  /* New driver hint banner */
+  .sync-hint { display: flex; align-items: flex-start; gap: 8px; background: #ECFDF5; border: 1px solid #6EE7B7; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; color: #047857; line-height: 1.5; }
+  .sync-hint .icon { flex-shrink: 0; font-size: 14px; }
+  .sync-hint strong { color: #065F46; }
+
+  /* Form */
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #374151; }
+  .form-group label .optional { color: #8F9193; font-weight: 400; font-size: 11px; }
+  .form-group input, .form-group select { width: 100%; padding: 7px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: #27AAE1; box-shadow: 0 0 0 3px rgba(39,170,225,0.12); }
+  .form-group .field-hint { font-size: 11px; color: #8F9193; margin-top: 4px; }
+  .form-group .field-error { font-size: 11px; color: #BA1A1A; margin-top: 4px; display: none; }
+  .form-group.has-error input, .form-group.has-error select { border-color: #BA1A1A; }
+  .form-group.has-error .field-error { display: block; }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
+  .cross-day-badge { display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #92400e; font-size: 11px; padding: 3px 10px; border-radius: 10px; margin-top: 4px; }
+
+  .section-divider { border-top: 1px dashed #e2e8f0; margin: 16px 0 14px; padding-top: 6px; }
+  .section-title { font-size: 11px; font-weight: 700; color: #8F9193; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; }
+
+  /* Upload */
+  .upload-area { border: 2px dashed #D1D1D6; border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; }
+  .upload-area:hover { border-color: #27AAE1; background: #FAFEFF; }
+  .upload-area.dragging { border-color: #27AAE1; background: #EAF9FF; }
+  .upload-area .icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-area .text { font-size: 13px; color: #374151; font-weight: 500; }
+  .upload-area .hint { font-size: 11px; color: #8F9193; margin-top: 4px; }
+  .upload-steps { display: flex; align-items: center; gap: 0; margin-bottom: 20px; }
+  .upload-step { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8F9193; }
+  .upload-step.active { color: #27AAE1; font-weight: 600; }
+  .upload-step.done { color: #10b981; }
+  .upload-step-num { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #D1D1D6; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+  .upload-step.active .upload-step-num { border-color: #27AAE1; background: #27AAE1; color: #fff; }
+  .upload-step.done .upload-step-num { border-color: #10b981; background: #10b981; color: #fff; }
+  .upload-step-line { width: 40px; height: 2px; background: #e2e8f0; margin: 0 8px; }
+  .preview-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 12px; }
+  .preview-table th { background: #f8fafc; padding: 7px 8px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; }
+  .preview-table td { padding: 5px 8px; border-bottom: 1px solid #e2e8f0; }
+  .preview-table tr:hover { background: #f8fafc; }
+  .preview-table tr.error { background: #FFEDEA; }
+  .preview-table tr.conflict { background: #FFF8E1; }
+  .preview-table .status-ok { color: #10b981; font-weight: 600; }
+  .preview-table .status-error { color: #BA1A1A; font-size: 10px; }
+  .preview-table .status-warn { color: #f59e0b; font-size: 10px; }
+  .type-badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+  .type-badge.day { background: #D4EFFC; color: #0B6E99; }
+  .type-badge.cross { background: #fef3c7; color: #92400e; }
+  .type-badge.off { background: #F2F3F5; color: #8F9193; }
+  .preview-summary { display: flex; gap: 12px; margin-bottom: 16px; }
+  .summary-card { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
+  .summary-card .num { font-size: 22px; font-weight: 700; }
+  .summary-card .label { font-size: 11px; color: #8F9193; margin-top: 2px; }
+  .summary-card.total { border-color: #27AAE1; background: #EAF9FF; }
+  .summary-card.total .num { color: #27AAE1; }
+  .summary-card.ok .num { color: #10b981; }
+  .summary-card.err .num { color: #BA1A1A; }
+  .summary-card.warn .num { color: #f59e0b; }
+  .mode-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+  .mode-option { flex: 1; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+  .mode-option:hover { border-color: #8DD4F0; }
+  .mode-option.selected { border-color: #27AAE1; background: #EAF9FF; }
+  .mode-option .mode-title { font-size: 13px; font-weight: 600; }
+  .mode-option .mode-desc { font-size: 11px; color: #8F9193; margin-top: 2px; }
+  .info-box { padding: 12px; background: #f8fafc; border-radius: 6px; font-size: 12px; color: #5C5F61; border: 1px solid #e2e8f0; }
+  .info-box strong { color: #374151; }
+  .info-box.warning { background: #FFF8E1; border-color: #fcd34d; color: #92400e; }
+  .info-box.success { background: #EAF6F1; border-color: #7CB342; color: #1a5c1a; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #374151; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 200; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 360px; }
+  .toast.show { display: flex; }
+  .toast.success { background: #059669; }
+  .toast.error { background: #BA1A1A; }
+  .toast .toast-action { background: rgba(255,255,255,0.2); border: none; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px; cursor: pointer; margin-left: 8px; }
+  .toast .toast-action:hover { background: rgba(255,255,255,0.3); }
+
+  /* Tooltip */
+  .tooltip { position: fixed; background: #374151; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11px; z-index: 50; pointer-events: none; white-space: pre-line; display: none; max-width: 250px; line-height: 1.5; }
+
+  /* Context menu */
+  .context-menu { position: fixed; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 60; min-width: 140px; padding: 4px 0; display: none; }
+  .context-menu.show { display: block; }
+  .context-menu-item { padding: 8px 14px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #374151; }
+  .context-menu-item:hover { background: #f5f7fa; }
+  .context-menu-item.danger { color: #BA1A1A; }
+  .context-menu-item.danger:hover { background: #FFEDEA; }
+  .context-menu-divider { height: 1px; background: #e2e8f0; margin: 4px 0; }
+
+  /* Scrollbar */
+  .content::-webkit-scrollbar { width: 8px; height: 8px; }
+  .content::-webkit-scrollbar-track { background: #f1f1f1; }
+  .content::-webkit-scrollbar-thumb { background: #D1D1D6; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">3D</div>
+      <span>3drens<sup>+</sup> tms</span>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">&#9786;</div>
+      <span>Shan Liu</span>
+    </div>
+    <div class="menu-section">
+      <div class="menu-item"><span class="icon">&#128269;</span> 貨態查詢</div>
+      <div class="menu-item menu-parent"><span class="icon">&#128196;</span> 託運單 <span class="chevron">&#9660;</span></div>
+      <div class="menu-item"><span class="icon">&#128666;</span> 派車單管理</div>
+      <div class="menu-item menu-parent"><span class="icon">&#127970;</span> 倉庫作業 <span class="chevron">&#9660;</span></div>
+      <div class="menu-item menu-parent"><span class="icon">&#128200;</span> 報表 <span class="chevron">&#9660;</span></div>
+      <div class="menu-item"><span class="icon">&#127760;</span> 客戶管理</div>
+      <div class="menu-item menu-parent expanded" onclick="toggleMenu(this)"><span class="icon">&#128100;</span> 司機管理 <span class="chevron">&#9650;</span></div>
+      <div class="menu-sub" id="driverSubmenu">
+        <div class="menu-item" onclick="switchTab('realtime')">即時監控</div>
+        <div class="menu-item" onclick="switchTab('list')">司機列表</div>
+        <div class="menu-item active" onclick="switchTab('schedule')">司機班表</div>
+      </div>
+      <div class="menu-item menu-parent"><span class="icon">&#128663;</span> 車輛管理 <span class="chevron">&#9660;</span></div>
+      <div class="menu-item menu-parent"><span class="icon">&#128178;</span> 定價管理 <span class="chevron">&#9660;</span></div>
+      <div class="menu-item menu-parent"><span class="icon">&#128203;</span> 帳務管理 <span class="chevron">&#9660;</span></div>
+      <div class="menu-item menu-parent"><span class="icon">&#128138;</span> 駕駛安全 <span class="chevron">&#9660;</span></div>
+      <div class="menu-item"><span class="icon">&#128276;</span> 通知中心</div>
+    </div>
+    <div class="sidebar-footer">使用條款 &nbsp; 隱私權政策<br>v_0.0.2.0</div>
+  </div>
+
+  <div class="main">
+    <!-- Top bar -->
+    <div class="topbar">
+      <span class="topbar-hamburger">&#9776;</span>
+      <span class="topbar-brand">3drens<sup>+</sup> tms</span>
+      <span class="topbar-page" id="topbarPage">司機班表</span>
+    </div>
+
+    <!-- ============ SCHEDULE PAGE ============ -->
+    <div id="schedulePage">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-left">
+          <h1>司機班表</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-outline" onclick="showToast('已匯出司機班表','success')">匯出</button>
+          <button class="btn btn-primary" onclick="showUploadModal()">&#8593; Excel 匯入班表</button>
+          <button class="btn btn-primary" onclick="openAddShift()">新增</button>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="nav-btn" onclick="navigate(-1)">&lt;</button>
+          <span class="current-period" id="currentPeriod">2026/03/23 ~ 2026/03/29</span>
+          <button class="nav-btn" onclick="navigate(1)">&gt;</button>
+          <button class="btn btn-sm btn-secondary" onclick="goToday()">今天</button>
+        </div>
+        <div class="toolbar-right">
+          <div class="filter-bar">
+            <input type="text" placeholder="搜尋司機..." style="width: 140px;" id="searchInput" oninput="filterDrivers()">
+          </div>
+          <div class="view-toggle">
+            <button class="btn btn-sm" id="weekViewBtn" onclick="switchView('week')">週</button>
+            <button class="btn btn-sm active" id="timelineViewBtn" onclick="switchView('timeline')">時間軸</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-bar">
+        <div class="legend-item"><div class="legend-dot day"></div><span class="legend-label">日班</span><span class="legend-count" id="statDay">0</span></div>
+        <div class="legend-item"><div class="legend-dot night"></div><span class="legend-label">夜班</span><span class="legend-count" id="statNight">0</span></div>
+        <div class="legend-item"><div class="legend-dot cross"></div><span class="legend-label">跨日班</span><span class="legend-count" id="statCross">0</span></div>
+        <div class="legend-item"><div class="legend-dot off"></div><span class="legend-label">休假</span><span class="legend-count" id="statOff">0</span></div>
+        <div style="margin-left:auto;display:flex;gap:4px;align-items:center;">
+          <span class="legend-label">下載匯入模板：</span>
+          <button class="btn btn-sm btn-secondary" onclick="showToast('已下載 Excel 匯入模板','success')">&#8595; .xlsx</button>
+        </div>
+      </div>
+
+      <!-- Timeline View -->
+      <div class="content" id="timelineView">
+        <div class="timeline-container" id="timelineContainer"></div>
+      </div>
+
+      <!-- Week View -->
+      <div class="content" id="weekView" style="display:none;">
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+    </div>
+
+    <!-- ============ DRIVER LIST PAGE (mock) ============ -->
+    <div id="driverListPage" style="display:none; flex:1; overflow:auto;">
+      <div class="header">
+        <div class="header-left"><h1>司機列表</h1></div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="switchTab('schedule')">回到班表</button>
+          <button class="btn btn-primary" onclick="switchTab('schedule');setTimeout(()=>openAddShift(),50)">新增司機</button>
+        </div>
+      </div>
+      <div class="driver-list-page">
+        <div class="table-card">
+          <table class="driver-table" id="driverTable"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== -->
+<!-- ADD / EDIT SHIFT MODAL   -->
+<!-- ======================== -->
+<div class="modal-overlay" id="shiftModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 id="shiftModalTitle">新增班次</h3>
+      <button class="modal-close" onclick="closeModal('shiftModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <!-- Driver selection mode -->
+      <div class="driver-mode-tabs" id="driverModeTabs">
+        <div class="driver-mode-tab active" data-mode="existing" onclick="setDriverMode('existing')">
+          <span class="tab-icon">&#128100;</span> 選擇既有司機
+        </div>
+        <div class="driver-mode-tab" data-mode="new" onclick="setDriverMode('new')">
+          <span class="tab-icon">&#10133;</span> 新增司機
+        </div>
+      </div>
+
+      <!-- Existing driver mode -->
+      <div id="existingDriverFields">
+        <div class="form-group">
+          <label>司機 *</label>
+          <select id="shiftStaff"></select>
+        </div>
+      </div>
+
+      <!-- New driver mode -->
+      <div id="newDriverFields" style="display:none;">
+        <div class="sync-hint">
+          <span class="icon">&#9889;</span>
+          <div>
+            <strong>同時建立司機</strong>：填寫後司機會自動加入「司機管理 → 司機列表」，並排入此班次。
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" id="newDriverNameGroup">
+            <label>姓名 *</label>
+            <input type="text" id="newDriverName" placeholder="例：張小明" onblur="validateNewDriver()">
+            <div class="field-error">請填寫姓名</div>
+          </div>
+          <div class="form-group" id="newDriverPhoneGroup">
+            <label>手機 *</label>
+            <input type="text" id="newDriverPhone" placeholder="09xxxxxxxx" onblur="validateNewDriver()">
+            <div class="field-error">手機格式不正確</div>
+          </div>
+        </div>
+        <div class="form-group" id="newDriverEmailGroup">
+          <label>電子郵件 <span class="optional">（選填）</span></label>
+          <input type="email" id="newDriverEmail" placeholder="driver@example.com" onblur="validateNewDriver()">
+          <div class="field-error">電子郵件格式不正確</div>
+        </div>
+        <div class="form-group" id="newDriverAddressGroup">
+          <label>聯絡地址 <span class="optional">（選填）</span></label>
+          <input type="text" id="newDriverAddress" placeholder="例：台北市信義區松仁路 100 號">
+        </div>
+        <div class="form-group">
+          <label>駕照類型</label>
+          <select id="newDriverLicense">
+            <option value="general">一般小客車</option>
+            <option value="prof_small">職業小型車</option>
+            <option value="prof_large" selected>職業大客車</option>
+            <option value="truck">職業聯結車</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+      <div class="section-title">班次資訊</div>
+
+      <div class="form-group">
+        <label>日期 *</label>
+        <input type="date" id="shiftDate" value="2026-03-25">
+      </div>
+      <div class="form-group">
+        <label>假別</label>
+        <select id="shiftLeaveType" onchange="toggleTimeFields()">
+          <option value="">無（正常班次）</option>
+          <option value="off">休假</option>
+          <option value="statutory">例假</option>
+        </select>
+      </div>
+      <div id="timeFields">
+        <div class="form-row">
+          <div class="form-group">
+            <label>上班時間 *</label>
+            <input type="time" id="shiftStart" value="07:00" onchange="checkCrossDay()">
+          </div>
+          <div class="form-group">
+            <label>下班時間 *</label>
+            <input type="time" id="shiftEnd" value="19:00" onchange="checkCrossDay()">
+          </div>
+        </div>
+        <div id="crossDayHint" style="display:none;">
+          <span class="cross-day-badge">&#9889; 跨日班 — 下班時間為隔日</span>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>備註</label>
+        <input type="text" id="shiftNote" placeholder="選填">
+      </div>
+    </div>
+    <div class="modal-footer has-delete">
+      <div id="shiftDeleteArea" style="display:none;">
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteShift()">刪除此班次</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="btn btn-secondary" onclick="closeModal('shiftModal')">取消</button>
+        <button class="btn btn-primary" onclick="saveShift()" id="shiftSaveBtn">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal modal-sm" style="width:380px;">
+    <div class="modal-header">
+      <h3>確定要刪除嗎?</h3>
+      <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#5C5F61;" id="deleteMsg">刪除後此班次資料將無法復原。</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('deleteModal')">取消</button>
+      <button class="btn btn-danger" onclick="doDeleteShift()">確定刪除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== -->
+<!-- UPLOAD MODAL - 3 Steps   -->
+<!-- ======================== -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>Excel 匯入司機班表</h3>
+      <button class="modal-close" onclick="closeModal('uploadModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="upload-steps">
+        <div class="upload-step active" id="step1indicator"><div class="upload-step-num">1</div> 上傳檔案</div>
+        <div class="upload-step-line"></div>
+        <div class="upload-step" id="step2indicator"><div class="upload-step-num">2</div> 預覽確認</div>
+        <div class="upload-step-line"></div>
+        <div class="upload-step" id="step3indicator"><div class="upload-step-num">3</div> 匯入完成</div>
+      </div>
+      <div id="uploadStep1">
+        <div class="upload-area" onclick="simulateUpload()" ondragover="event.preventDefault();this.classList.add('dragging')" ondragleave="this.classList.remove('dragging')" ondrop="event.preventDefault();this.classList.remove('dragging');simulateUpload()">
+          <div class="icon">&#128196;</div>
+          <div class="text">點擊或拖曳 Excel 檔案至此上傳</div>
+          <div class="hint">支援 .xlsx / .xls / .csv，單次最多 500 筆</div>
+        </div>
+        <div class="info-box" style="margin-top:16px;">
+          <strong>Excel 匯入格式說明：</strong><br><br>
+          <table style="width:100%;font-size:12px;border-collapse:collapse;">
+            <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:3px 0;font-weight:600;width:100px;">欄位</td><td>說明</td><td style="width:40px;">必填</td></tr>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:3px 0;">司機編號</td><td>系統 ID 或手機號碼</td><td>*</td></tr>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:3px 0;">日期</td><td>YYYY/MM/DD</td><td>*</td></tr>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:3px 0;">上班時間</td><td>HH:MM（24小時制）</td><td>*</td></tr>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:3px 0;">下班時間</td><td>HH:MM（24小時制）</td><td>*</td></tr>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:3px 0;">假別</td><td>填「休假」或「例假」，時間可留空</td><td></td></tr>
+            <tr><td style="padding:3px 0;">備註</td><td>自由文字</td><td></td></tr>
+          </table>
+          <br><strong>跨日自動判定：</strong>下班時間 &lt; 上班時間 = 跨日班（如 22:00~06:00）
+        </div>
+      </div>
+      <div id="uploadStep2" style="display:none;">
+        <div class="mode-toggle">
+          <div class="mode-option selected" onclick="selectMode(this)"><div class="mode-title">&#128260; 覆蓋模式</div><div class="mode-desc">相同司機+日期的班次將被覆蓋</div></div>
+          <div class="mode-option" onclick="selectMode(this)"><div class="mode-title">&#10133; 追加模式</div><div class="mode-desc">遇重複跳過不匯入</div></div>
+        </div>
+        <div class="preview-summary">
+          <div class="summary-card total"><div class="num">12</div><div class="label">總筆數</div></div>
+          <div class="summary-card ok"><div class="num">9</div><div class="label">可匯入</div></div>
+          <div class="summary-card warn"><div class="num">2</div><div class="label">將覆蓋</div></div>
+          <div class="summary-card err"><div class="num">1</div><div class="label">異常</div></div>
+        </div>
+        <div style="max-height:280px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;">
+          <table class="preview-table">
+            <thead><tr><th style="width:28px;"><input type="checkbox" checked onchange="toggleAll(this)"></th><th>列</th><th>司機</th><th>姓名</th><th>日期</th><th>上班</th><th>下班</th><th>時數</th><th>類型</th><th>狀態</th></tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox" checked></td><td>1</td><td>D001</td><td>王大明</td><td>03/24</td><td>07:00</td><td>19:00</td><td>12h</td><td><span class="type-badge day">日班</span></td><td class="status-ok">OK</td></tr>
+              <tr><td><input type="checkbox" checked></td><td>2</td><td>D001</td><td>王大明</td><td>03/25</td><td>22:00</td><td>06:00</td><td>8h</td><td><span class="type-badge cross">跨日</span></td><td class="status-ok">OK</td></tr>
+              <tr><td><input type="checkbox" checked></td><td>3</td><td>D002</td><td>李小華</td><td>03/24</td><td>19:00</td><td>03:00</td><td>8h</td><td><span class="type-badge cross">跨日</span></td><td class="status-ok">OK</td></tr>
+              <tr class="error"><td><input type="checkbox" disabled></td><td>12</td><td>D099</td><td>-</td><td>03/24</td><td>07:00</td><td>19:00</td><td>12h</td><td>-</td><td class="status-error">&#10060; 不存在</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="info-box warning" style="margin-top:12px;"><strong>&#9888;</strong> 2 筆將覆蓋既有班次。1 筆異常將跳過。</div>
+      </div>
+      <div id="uploadStep3" style="display:none;text-align:center;padding:20px 0;">
+        <div style="font-size:48px;margin-bottom:12px;">&#9989;</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px;">匯入完成</div>
+        <div style="font-size:13px;color:#5C5F61;margin-bottom:20px;">成功匯入 11 筆，跳過 1 筆</div>
+        <div class="preview-summary" style="max-width:300px;margin:0 auto 20px;">
+          <div class="summary-card ok"><div class="num">11</div><div class="label">成功</div></div>
+          <div class="summary-card err"><div class="num">1</div><div class="label">跳過</div></div>
+        </div>
+        <div class="info-box success" style="max-width:400px;margin:0 auto;">班表已即時更新，可切換檢視確認。</div>
+      </div>
+    </div>
+    <div class="modal-footer" id="uploadFooter">
+      <button class="btn btn-secondary" onclick="handleUploadBack()" id="uploadCancelBtn">取消</button>
+      <button class="btn btn-primary" id="uploadActionBtn" style="display:none;" onclick="handleUploadAction()">上傳檔案</button>
+    </div>
+  </div>
+</div>
+
+<!-- Context menu -->
+<div class="context-menu" id="contextMenu">
+  <div class="context-menu-item" onclick="editFromContext()">&#9998; 編輯班次</div>
+  <div class="context-menu-divider"></div>
+  <div class="context-menu-item danger" onclick="deleteFromContext()">&#128465; 刪除班次</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ========================
+// DATA
+// ========================
+const staffData = [
+  { id: 'D001', name: '王大明', phone: '0912345678', email: 'wang@example.com', address: '台北市中正區重慶南路一段 122 號', avatar: '王', license: 'prof_large', isNew: false },
+  { id: 'D002', name: '李小華', phone: '0923456789', email: 'lee@example.com', address: '新北市板橋區文化路二段 80 號', avatar: '李', license: 'prof_large', isNew: false },
+  { id: 'D003', name: '陳志明', phone: '0934567890', email: 'chen@example.com', address: '桃園市中壢區中央西路 35 號', avatar: '陳', license: 'truck', isNew: false },
+  { id: 'D004', name: '林建宏', phone: '0945678901', email: 'lin@example.com', address: '台中市西屯區市政路 78 號', avatar: '林', license: 'prof_small', isNew: false },
+  { id: 'D005', name: '黃正義', phone: '0956789012', email: 'huang@example.com', address: '高雄市苓雅區四維三路 6 號', avatar: '黃', license: 'prof_large', isNew: false },
+];
+
+const scheduleData = {
+  'D001': {
+    '2026-03-23': { start: '07:00', end: '19:00', type: 'day' },
+    '2026-03-24': { start: '07:00', end: '19:00', type: 'day' },
+    '2026-03-25': { start: '22:00', end: '06:00', type: 'cross' },
+    '2026-03-26': null,
+    '2026-03-27': { start: '07:00', end: '15:00', type: 'day' },
+    '2026-03-28': { start: '07:00', end: '19:00', type: 'day' },
+    '2026-03-29': null,
+  },
+  'D002': {
+    '2026-03-23': { start: '19:00', end: '03:00', type: 'cross' },
+    '2026-03-24': { start: '19:00', end: '03:00', type: 'cross' },
+    '2026-03-25': { start: '19:00', end: '03:00', type: 'cross' },
+    '2026-03-26': null,
+    '2026-03-27': { start: '20:00', end: '04:00', type: 'cross' },
+    '2026-03-28': null,
+    '2026-03-29': null,
+  },
+  'D003': {
+    '2026-03-23': { start: '07:00', end: '15:00', type: 'day' },
+    '2026-03-24': { start: '07:00', end: '15:00', type: 'day' },
+    '2026-03-25': { start: '07:00', end: '19:00', type: 'day' },
+    '2026-03-26': { start: '13:00', end: '21:00', type: 'day' },
+    '2026-03-27': { start: '07:00', end: '15:00', type: 'day' },
+    '2026-03-28': null,
+    '2026-03-29': { start: '06:00', end: '14:00', type: 'day' },
+  },
+  'D004': {
+    '2026-03-23': null,
+    '2026-03-24': null,
+    '2026-03-25': { start: '20:00', end: '08:00', type: 'cross' },
+    '2026-03-26': { start: '20:00', end: '08:00', type: 'cross' },
+    '2026-03-27': null,
+    '2026-03-28': { start: '08:00', end: '20:00', type: 'day' },
+    '2026-03-29': { start: '08:00', end: '20:00', type: 'day' },
+  },
+  'D005': {
+    '2026-03-23': { start: '06:00', end: '14:00', type: 'day' },
+    '2026-03-24': { start: '06:00', end: '14:00', type: 'day' },
+    '2026-03-25': { start: '07:00', end: '19:00', type: 'day' },
+    '2026-03-26': { start: '22:00', end: '06:00', type: 'cross' },
+    '2026-03-27': null,
+    '2026-03-28': null,
+    '2026-03-29': { start: '22:00', end: '10:00', type: 'cross' },
+  },
+};
+
+let currentWeekStart = new Date(2026, 2, 23);
+let currentView = 'timeline';
+let filteredStaff = [...staffData];
+let editingShift = null;
+let driverMode = 'existing';
+const dayNames = ['日','一','二','三','四','五','六'];
+const todayDate = new Date(2026, 2, 25);
+const licenseLabels = { general:'一般小客車', prof_small:'職業小型車', prof_large:'職業大客車', truck:'職業聯結車' };
+
+// ========================
+// UTILITIES
+// ========================
+function fmt(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function weekDates(s) { const a=[]; for(let i=0;i<7;i++){const d=new Date(s);d.setDate(d.getDate()+i);a.push(d);} return a; }
+function isToday(d) { return d.toDateString()===todayDate.toDateString(); }
+function pH(t) { return parseInt(t.split(':')[0],10); }
+function cH(s,e,cross) { const a=pH(s),b=pH(e); return cross||b<=a ? (24-a)+b : b-a; }
+function nextEmpId() {
+  const nums = staffData.map(s => parseInt(s.id.replace(/\D/g,''),10)).filter(n=>!isNaN(n));
+  const max = nums.length ? Math.max(...nums) : 0;
+  return 'D' + String(max+1).padStart(3,'0');
+}
+
+// ========================
+// TIMELINE VIEW
+// ========================
+function renderTimeline() {
+  const c = document.getElementById('timelineContainer');
+  const dates = weekDates(currentWeekStart);
+  const hw = 28;
+  let h = '<div class="timeline-header-row"><div class="timeline-corner">司機</div>';
+  dates.forEach(d => {
+    const dow=d.getDay(), td=isToday(d), we=dow===0||dow===6;
+    const cls = td?' today':(we?' weekend':'');
+    h += `<div class="timeline-date-group"><div class="timeline-date-label${cls}">${d.getMonth()+1}/${d.getDate()} (${dayNames[dow]})</div><div class="timeline-hours">`;
+    for(let i=0;i<24;i++){let hc='';if(i===6)hc=' h6';if(i===12)hc=' h12';if(i===18)hc=' h18'; h+=`<div class="timeline-hour${hc}">${i}</div>`;}
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  filteredStaff.forEach(staff => {
+    const newBadge = staff.isNew ? '<span class="new-badge">新</span>' : '';
+    h += `<div class="timeline-row"><div class="timeline-staff" onclick="openAddShift('${staff.id}')"><div class="staff-avatar driver">${staff.avatar}</div><div class="staff-info"><div class="name-row"><span class="name">${staff.name}</span>${newBadge}</div><span class="role">${staff.phone}</span></div></div><div class="timeline-shifts">`;
+    dates.forEach(d => {
+      const key=fmt(d), shift=scheduleData[staff.id]&&scheduleData[staff.id][key];
+      const prevD=new Date(d);prevD.setDate(prevD.getDate()-1);
+      const prevK=fmt(prevD), prevS=scheduleData[staff.id]&&scheduleData[staff.id][prevK];
+
+      h += `<div class="timeline-day-block clickable" ondblclick="openAddShiftAt('${staff.id}','${key}')">`;
+
+      if(prevS&&prevS.type==='cross'){
+        const eH=pH(prevS.end);
+        if(eH>0){ h+=`<div class="shift-bar cross-day cross-day-end" style="left:0;width:${eH*hw}px;" onmouseenter="showTip(event,'${staff.name} 跨日(續)\\n${prevK} ${prevS.start}~隔日${prevS.end}')" onmouseleave="hideTip()"><span class="shift-bar-time">~${prevS.end}</span></div>`; }
+      }
+
+      if(shift===null){
+        h+=`<div class="shift-bar off-day" style="left:${8*hw}px;width:${8*hw}px;" onclick="event.stopPropagation();openEditShift('${staff.id}','${key}')" oncontextmenu="event.preventDefault();event.stopPropagation();showCtx(event,'${staff.id}','${key}')"><span class="shift-bar-time">休假</span></div>`;
+      } else if(shift){
+        const sH=pH(shift.start),eH=pH(shift.end),cross=shift.type==='cross';
+        if(cross){
+          const l=sH*hw,w=(24-sH)*hw;
+          h+=`<div class="shift-bar cross-day cross-day-start" style="left:${l}px;width:${w}px;" onclick="event.stopPropagation();openEditShift('${staff.id}','${key}')" oncontextmenu="event.preventDefault();event.stopPropagation();showCtx(event,'${staff.id}','${key}')" onmouseenter="showTip(event,'${staff.name} 跨日班\\n${shift.start}~隔日${shift.end} (${cH(shift.start,shift.end,true)}h)\\n\\n點擊編輯 | 右鍵選單')" onmouseleave="hideTip()"><span class="shift-bar-time">${shift.start}~隔${shift.end}</span><span class="shift-bar-label">跨日</span></div>`;
+        } else {
+          const l=sH*hw,w=(eH-sH)*hw,night=sH>=18,cls=night?'night-shift':'day-shift',lbl=night?'夜班':'日班';
+          h+=`<div class="shift-bar ${cls}" style="left:${l}px;width:${w}px;" onclick="event.stopPropagation();openEditShift('${staff.id}','${key}')" oncontextmenu="event.preventDefault();event.stopPropagation();showCtx(event,'${staff.id}','${key}')" onmouseenter="showTip(event,'${staff.name} ${lbl}\\n${shift.start}~${shift.end} (${cH(shift.start,shift.end,false)}h)\\n\\n點擊編輯 | 右鍵選單')" onmouseleave="hideTip()"><span class="shift-bar-time">${shift.start}-${shift.end}</span><span class="shift-bar-label">${lbl}</span></div>`;
+        }
+      }
+      h += '</div>';
+    });
+    h += '</div></div>';
+  });
+  c.innerHTML = h;
+  updateStats(dates);
+}
+
+// ========================
+// WEEK VIEW
+// ========================
+function renderWeekView() {
+  const g=document.getElementById('weekGrid'), dates=weekDates(currentWeekStart);
+  let h='<div class="week-header" style="position:sticky;left:0;z-index:3;background:#f8fafc;">司機</div>';
+  dates.forEach(d=>{const dow=d.getDay(),td=isToday(d),we=dow===0||dow===6;const cls=td?' today':(we?' weekend':'');h+=`<div class="week-header${cls}"><div class="day">週${dayNames[dow]}</div><div class="date">${d.getDate()}</div></div>`;});
+
+  filteredStaff.forEach(staff=>{
+    const newBadge = staff.isNew ? '<span class="new-badge">新</span>' : '';
+    h+=`<div class="staff-name-cell"><div class="staff-avatar driver">${staff.avatar}</div><div class="staff-info"><div class="name-row"><span class="name">${staff.name}</span>${newBadge}</div><span class="role">${staff.phone}</span></div></div>`;
+    dates.forEach(d=>{
+      const key=fmt(d),shift=scheduleData[staff.id]&&scheduleData[staff.id][key],td=isToday(d)?'today':'';
+      if(shift===null){
+        h+=`<div class="schedule-cell ${td}" onclick="openEditShift('${staff.id}','${key}')" oncontextmenu="event.preventDefault();showCtx(event,'${staff.id}','${key}')"><div class="shift-block off-day">休假</div></div>`;
+      } else if(shift){
+        let bc='day-shift',lb='日班';if(shift.type==='cross'){bc='cross-day';lb='跨日';}
+        const el=shift.type==='cross'?`隔${shift.end}`:shift.end;
+        h+=`<div class="schedule-cell ${td}" onclick="openEditShift('${staff.id}','${key}')" oncontextmenu="event.preventDefault();showCtx(event,'${staff.id}','${key}')"><div class="shift-block ${bc}"><div class="shift-time">${shift.start}-${el}</div><div class="shift-label">${lb} ${cH(shift.start,shift.end,shift.type==='cross')}h</div></div></div>`;
+      } else {
+        h+=`<div class="schedule-cell ${td}" ondblclick="openAddShiftAt('${staff.id}','${key}')"></div>`;
+      }
+    });
+  });
+  g.innerHTML=h;
+  updateStats(dates);
+}
+
+// ========================
+// DRIVER LIST (mock)
+// ========================
+function renderDriverList() {
+  const t = document.getElementById('driverTable');
+  let h = `<thead><tr><th style="width:70px;">編號</th><th style="width:140px;">姓名</th><th style="width:120px;">手機</th><th>電子郵件</th><th>聯絡地址</th><th style="width:110px;">駕照類型</th><th style="width:80px;">狀態</th></tr></thead><tbody>`;
+  staffData.forEach(s => {
+    const cls = s.isNew ? 'new-row' : '';
+    const newTag = s.isNew ? '<span class="new-badge">新</span>' : '';
+    const email = s.email || '<span style="color:#8F9193;">—</span>';
+    const address = s.address || '<span style="color:#8F9193;">—</span>';
+    h += `<tr class="${cls}"><td>${s.id}</td><td class="driver-name-cell"><div class="staff-avatar driver" style="width:24px;height:24px;font-size:10px;">${s.avatar}</div><span>${s.name}</span>${newTag}</td><td>${s.phone}</td><td>${email}</td><td>${address}</td><td>${licenseLabels[s.license]||'-'}</td><td><span style="color:#10b981;font-weight:600;">啟用中</span></td></tr>`;
+  });
+  h += '</tbody>';
+  t.innerHTML = h;
+}
+
+// ========================
+// STATS
+// ========================
+function updateStats(dates){
+  let d=0,n=0,cr=0,o=0;
+  filteredStaff.forEach(s=>{dates.forEach(dt=>{const k=fmt(dt),sh=scheduleData[s.id]&&scheduleData[s.id][k];if(sh===null)o++;else if(sh){if(sh.type==='cross')cr++;else if(pH(sh.start)>=18)n++;else d++;}});});
+  document.getElementById('statDay').textContent=d;
+  document.getElementById('statNight').textContent=n;
+  document.getElementById('statCross').textContent=cr;
+  document.getElementById('statOff').textContent=o;
+}
+
+// ========================
+// DRIVER MODE TOGGLE
+// ========================
+function setDriverMode(mode) {
+  driverMode = mode;
+  document.querySelectorAll('.driver-mode-tab').forEach(el => el.classList.toggle('active', el.dataset.mode === mode));
+  document.getElementById('existingDriverFields').style.display = mode === 'existing' ? '' : 'none';
+  document.getElementById('newDriverFields').style.display = mode === 'new' ? '' : 'none';
+  document.querySelectorAll('#newDriverFields .form-group').forEach(g => g.classList.remove('has-error'));
+}
+
+function validateNewDriver() {
+  let ok = true;
+  const nameGroup = document.getElementById('newDriverNameGroup');
+  if (!document.getElementById('newDriverName').value.trim()) { nameGroup.classList.add('has-error'); ok = false; }
+  else nameGroup.classList.remove('has-error');
+
+  const phoneGroup = document.getElementById('newDriverPhoneGroup');
+  const phone = document.getElementById('newDriverPhone').value.trim();
+  let phoneOk = /^09\d{8}$/.test(phone);
+  if (!phoneOk) {
+    phoneGroup.classList.add('has-error');
+    phoneGroup.querySelector('.field-error').textContent = '手機格式不正確';
+    ok = false;
+  } else if (staffData.some(s => s.phone === phone)) {
+    phoneGroup.classList.add('has-error');
+    phoneGroup.querySelector('.field-error').textContent = '此手機已被其他司機使用';
+    ok = false;
+  } else {
+    phoneGroup.classList.remove('has-error');
+    phoneGroup.querySelector('.field-error').textContent = '手機格式不正確';
+  }
+
+  const emailGroup = document.getElementById('newDriverEmailGroup');
+  const email = document.getElementById('newDriverEmail').value.trim();
+  if (email) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailGroup.classList.add('has-error');
+      emailGroup.querySelector('.field-error').textContent = '電子郵件格式不正確';
+      ok = false;
+    } else if (staffData.some(s => (s.email || '').toLowerCase() === email.toLowerCase())) {
+      emailGroup.classList.add('has-error');
+      emailGroup.querySelector('.field-error').textContent = '此電子郵件已被其他司機使用';
+      ok = false;
+    } else {
+      emailGroup.classList.remove('has-error');
+    }
+  } else {
+    emailGroup.classList.remove('has-error');
+  }
+
+  return ok;
+}
+
+// ========================
+// CRUD - Add / Edit / Delete
+// ========================
+function populateStaffSelect(){
+  const sel=document.getElementById('shiftStaff');
+  sel.innerHTML='<option value="">選擇司機</option>'+staffData.map(s=>`<option value="${s.id}">${s.name} (${s.phone})</option>`).join('');
+}
+
+function openAddShift(staffId){
+  editingShift=null;
+  document.getElementById('shiftModalTitle').textContent='新增班次';
+  document.getElementById('shiftDeleteArea').style.display='none';
+  document.getElementById('shiftSaveBtn').textContent='儲存';
+  document.getElementById('driverModeTabs').style.display='';
+  setDriverMode('existing');
+  populateStaffSelect();
+  if(staffId) document.getElementById('shiftStaff').value=staffId;
+  document.getElementById('shiftDate').value=fmt(todayDate);
+  document.getElementById('shiftLeaveType').value='';
+  document.getElementById('shiftStart').value='07:00';
+  document.getElementById('shiftEnd').value='19:00';
+  document.getElementById('shiftNote').value='';
+  document.getElementById('newDriverName').value='';
+  document.getElementById('newDriverPhone').value='';
+  document.getElementById('newDriverEmail').value='';
+  document.getElementById('newDriverAddress').value='';
+  document.getElementById('newDriverLicense').value='prof_large';
+  toggleTimeFields();
+  checkCrossDay();
+  document.getElementById('shiftModal').classList.add('show');
+}
+
+function openAddShiftAt(staffId,dateKey){
+  openAddShift(staffId);
+  document.getElementById('shiftDate').value=dateKey;
+}
+
+function openEditShift(staffId,dateKey){
+  editingShift={staffId,dateKey};
+  const shift=scheduleData[staffId]&&scheduleData[staffId][dateKey];
+  document.getElementById('shiftModalTitle').textContent='編輯班次';
+  document.getElementById('shiftDeleteArea').style.display='';
+  document.getElementById('shiftSaveBtn').textContent='儲存變更';
+  // In edit mode, hide driver mode tabs — can't switch driver
+  document.getElementById('driverModeTabs').style.display='none';
+  setDriverMode('existing');
+  populateStaffSelect();
+  document.getElementById('shiftStaff').value=staffId;
+  document.getElementById('shiftDate').value=dateKey;
+  if(shift===null){
+    document.getElementById('shiftLeaveType').value='off';
+    document.getElementById('shiftStart').value='';
+    document.getElementById('shiftEnd').value='';
+  } else if(shift){
+    document.getElementById('shiftLeaveType').value='';
+    document.getElementById('shiftStart').value=shift.start;
+    document.getElementById('shiftEnd').value=shift.end;
+  }
+  document.getElementById('shiftNote').value='';
+  toggleTimeFields();
+  checkCrossDay();
+  document.getElementById('shiftModal').classList.add('show');
+}
+
+function saveShift(){
+  const dateKey = document.getElementById('shiftDate').value;
+  const leave = document.getElementById('shiftLeaveType').value;
+  if (!dateKey) { showToast('請填寫日期','error'); return; }
+
+  let staffId, createdNew = false, newDriverInfo = null;
+
+  if (driverMode === 'new') {
+    if (!validateNewDriver()) { showToast('請完成新增司機資料','error'); return; }
+    staffId = nextEmpId();
+    const name = document.getElementById('newDriverName').value.trim();
+    const phone = document.getElementById('newDriverPhone').value.trim();
+    const email = document.getElementById('newDriverEmail').value.trim();
+    const address = document.getElementById('newDriverAddress').value.trim();
+    const license = document.getElementById('newDriverLicense').value;
+    const newDriver = { id: staffId, name, phone, email, address, avatar: name.charAt(0), license, isNew: true };
+    staffData.push(newDriver);
+    filteredStaff = [...staffData];
+    createdNew = true;
+    newDriverInfo = newDriver;
+  } else {
+    staffId = document.getElementById('shiftStaff').value;
+    if (!staffId) { showToast('請選擇司機','error'); return; }
+  }
+
+  if (!scheduleData[staffId]) scheduleData[staffId] = {};
+
+  if (leave === 'off' || leave === 'statutory') {
+    scheduleData[staffId][dateKey] = null;
+  } else {
+    const start = document.getElementById('shiftStart').value;
+    const end = document.getElementById('shiftEnd').value;
+    if (!start || !end) { showToast('請填寫上下班時間','error'); return; }
+    const cross = end < start;
+    scheduleData[staffId][dateKey] = { start, end, type: cross ? 'cross' : 'day' };
+  }
+
+  closeModal('shiftModal');
+
+  if (createdNew) {
+    showToastWithAction(
+      `已新增司機 ${newDriverInfo.name}（${newDriverInfo.id}）並建立 ${dateKey} 班次，已同步至司機管理。`,
+      'success',
+      '前往司機列表',
+      () => switchTab('list')
+    );
+  } else {
+    const action = editingShift ? '已更新' : '已新增';
+    const name = staffData.find(s => s.id === staffId)?.name || staffId;
+    showToast(`${name} ${dateKey} 班次${action}`, 'success');
+  }
+
+  // Schedule expiry of isNew badge after 60s (simulate session highlight)
+  if (createdNew && newDriverInfo) {
+    setTimeout(() => { newDriverInfo.isNew = false; render(); renderDriverList(); }, 60000);
+  }
+
+  render();
+  renderDriverList();
+}
+
+function confirmDeleteShift(){
+  closeModal('shiftModal');
+  if(!editingShift)return;
+  const name=staffData.find(s=>s.id===editingShift.staffId)?.name||editingShift.staffId;
+  document.getElementById('deleteMsg').textContent=`確定刪除 ${name} 在 ${editingShift.dateKey} 的班次？此操作無法復原。`;
+  document.getElementById('deleteModal').classList.add('show');
+}
+
+function doDeleteShift(){
+  if(editingShift&&scheduleData[editingShift.staffId]){
+    delete scheduleData[editingShift.staffId][editingShift.dateKey];
+  }
+  closeModal('deleteModal');
+  const name=staffData.find(s=>s.id===editingShift.staffId)?.name||'';
+  showToast(`${name} ${editingShift.dateKey} 班次已刪除`,'success');
+  editingShift=null;
+  render();
+}
+
+// Context menu
+let ctxTarget=null;
+function showCtx(event,staffId,dateKey){
+  ctxTarget={staffId,dateKey};
+  const menu=document.getElementById('contextMenu');
+  menu.style.left=event.clientX+'px';
+  menu.style.top=event.clientY+'px';
+  menu.classList.add('show');
+}
+function editFromContext(){document.getElementById('contextMenu').classList.remove('show');if(ctxTarget)openEditShift(ctxTarget.staffId,ctxTarget.dateKey);}
+function deleteFromContext(){document.getElementById('contextMenu').classList.remove('show');if(ctxTarget){editingShift=ctxTarget;confirmDeleteShift();}}
+document.addEventListener('click',()=>document.getElementById('contextMenu').classList.remove('show'));
+
+// ========================
+// FORM HELPERS
+// ========================
+function toggleTimeFields(){
+  const leave=document.getElementById('shiftLeaveType').value;
+  document.getElementById('timeFields').style.display=leave?'none':'';
+}
+function checkCrossDay(){
+  const s=document.getElementById('shiftStart').value,e=document.getElementById('shiftEnd').value;
+  document.getElementById('crossDayHint').style.display=(s&&e&&e<s)?'':'none';
+}
+
+// ========================
+// VIEW / NAV
+// ========================
+function switchView(v){
+  currentView=v;
+  document.getElementById('timelineView').style.display=v==='timeline'?'':'none';
+  document.getElementById('weekView').style.display=v==='week'?'':'none';
+  document.getElementById('timelineViewBtn').classList.toggle('active',v==='timeline');
+  document.getElementById('weekViewBtn').classList.toggle('active',v==='week');
+  render();
+}
+function render(){if(currentView==='timeline')renderTimeline();else renderWeekView();}
+function navigate(dir){currentWeekStart.setDate(currentWeekStart.getDate()+(dir*7));updatePeriod();render();}
+function goToday(){currentWeekStart=new Date(2026,2,23);updatePeriod();render();}
+function updatePeriod(){
+  const dates=weekDates(currentWeekStart);
+  const s=dates[0],e=dates[6];
+  document.getElementById('currentPeriod').textContent=`${s.getFullYear()}/${String(s.getMonth()+1).padStart(2,'0')}/${String(s.getDate()).padStart(2,'0')} ~ ${e.getFullYear()}/${String(e.getMonth()+1).padStart(2,'0')}/${String(e.getDate()).padStart(2,'0')}`;
+}
+function switchTab(t){
+  document.querySelectorAll('.menu-sub .menu-item').forEach(el=>el.classList.remove('active'));
+  const items=document.querySelectorAll('.menu-sub .menu-item');
+  const sched = document.getElementById('schedulePage');
+  const list = document.getElementById('driverListPage');
+  const tp = document.getElementById('topbarPage');
+  if(t==='realtime'){items[0].classList.add('active'); sched.style.display='none'; list.style.display='none'; tp.textContent='即時監控'; showToast('即時監控頁面（mock）','');}
+  else if(t==='list'){items[1].classList.add('active'); sched.style.display='none'; list.style.display='flex'; list.style.flexDirection='column'; tp.textContent='司機列表'; renderDriverList();}
+  else {items[2].classList.add('active'); sched.style.display=''; list.style.display='none'; tp.textContent='司機班表';}
+}
+function toggleMenu(el){el.classList.toggle('expanded');const sub=el.nextElementSibling;if(sub)sub.style.display=sub.style.display==='none'?'':'none';}
+function filterDrivers(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  filteredStaff=q?staffData.filter(s=>s.name.includes(q)||s.phone.includes(q)):[...staffData];
+  render();
+}
+
+// ========================
+// UPLOAD MODAL
+// ========================
+let uploadStep=1;
+function showUploadModal(){uploadStep=1;updateUploadStep();document.getElementById('uploadModal').classList.add('show');}
+function simulateUpload(){uploadStep=2;updateUploadStep();}
+function handleUploadAction(){
+  if(uploadStep===2){uploadStep=3;updateUploadStep();}
+  else{closeModal('uploadModal');showToast('班表匯入完成，已更新 11 筆','success');}
+}
+function handleUploadBack(){
+  if(uploadStep===2){uploadStep=1;updateUploadStep();}
+  else closeModal('uploadModal');
+}
+function updateUploadStep(){
+  document.getElementById('uploadStep1').style.display=uploadStep===1?'':'none';
+  document.getElementById('uploadStep2').style.display=uploadStep===2?'':'none';
+  document.getElementById('uploadStep3').style.display=uploadStep===3?'':'none';
+  const s1=document.getElementById('step1indicator'),s2=document.getElementById('step2indicator'),s3=document.getElementById('step3indicator');
+  s1.className='upload-step'+(uploadStep===1?' active':(uploadStep>1?' done':''));
+  s2.className='upload-step'+(uploadStep===2?' active':(uploadStep>2?' done':''));
+  s3.className='upload-step'+(uploadStep===3?' active':'');
+  const btn=document.getElementById('uploadActionBtn'),cb=document.getElementById('uploadCancelBtn');
+  if(uploadStep===1){btn.style.display='none';cb.textContent='取消';cb.style.display='';}
+  else if(uploadStep===2){btn.style.display='';btn.textContent='確認匯入 (11 筆)';btn.className='btn btn-success';cb.textContent='返回';cb.style.display='';}
+  else{btn.style.display='';btn.textContent='完成';btn.className='btn btn-primary';cb.style.display='none';}
+}
+function selectMode(el){document.querySelectorAll('.mode-option').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');}
+function toggleAll(el){document.querySelectorAll('.preview-table tbody input[type=checkbox]:not(:disabled)').forEach(cb=>cb.checked=el.checked);}
+
+// ========================
+// MODAL / TOAST / TOOLTIP
+// ========================
+function closeModal(id){document.getElementById(id).classList.remove('show');if(id==='uploadModal'){uploadStep=1;}}
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.innerHTML='<span>'+msg+'</span>';
+  t.className='toast show '+(type||'');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.className='toast',3500);
+}
+function showToastWithAction(msg, type, actionLabel, actionFn) {
+  const t = document.getElementById('toast');
+  t.innerHTML = '<span>' + msg + '</span>';
+  const btn = document.createElement('button');
+  btn.className = 'toast-action';
+  btn.textContent = actionLabel;
+  btn.onclick = () => { t.className='toast'; actionFn && actionFn(); };
+  t.appendChild(btn);
+  t.className = 'toast show ' + (type || '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className='toast', 6000);
+}
+function showTip(e,text){const t=document.getElementById('tooltip');t.innerHTML=text.replace(/\\n/g,'<br>');t.style.display='block';const r=e.target.getBoundingClientRect();t.style.left=Math.min(r.left+r.width/2,window.innerWidth-200)+'px';t.style.top=(r.top-t.offsetHeight-10)+'px';}
+function hideTip(){document.getElementById('tooltip').style.display='none';}
+
+// ========================
+// INIT
+// ========================
+renderTimeline();
+renderDriverList();
+</script>
+</body>
+</html>
